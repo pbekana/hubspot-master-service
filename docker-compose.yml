@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # FastAPI application
+  api:
+    build: .
+    container_name: hubspot-master-service
+    ports:
+      - "3000:3000"
+    environment:
+      - APP_ENV=development
+      - LOG_LEVEL=INFO
+      - DATABASE_URL=postgresql://hubspot_user:hubspot_pass@postgres:5432/hubspot_master
+      - HUBSPOT_CLIENT_ID=${HUBSPOT_CLIENT_ID}
+      - HUBSPOT_CLIENT_SECRET=${HUBSPOT_CLIENT_SECRET}
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_SECURE=false
+      - HMAC_ENABLED=true
+      - HMAC_SECRET_KEY_CORE=${HMAC_SECRET_KEY_CORE:-coordinator-secret}
+      - HMAC_SECRET_KEY_ENGINEER=${HMAC_SECRET_KEY_ENGINEER:-engineer-secret}
+    depends_on:
+      - postgres
+      - minio
+    volumes:
+      - ./apps:/app/apps
+      - ./data:/app/data
+    networks:
+      - hubspot-network
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    container_name: hubspot-postgres
+    environment:
+      - POSTGRES_USER=hubspot_user
+      - POSTGRES_PASSWORD=hubspot_pass
+      - POSTGRES_DB=hubspot_master
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - hubspot-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hubspot_user -d hubspot_master"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO object storage
+  minio:
+    image: minio/minio:latest
+    container_name: hubspot-minio
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - hubspot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  postgres-data:
+  minio-data:
+
+networks:
+  hubspot-network:
+    driver: bridge
