@@ -79,13 +79,13 @@ async def get_stats():
 
 
 # Import and register routers
-# Note: These will be imported after routers are created
-# from apps.api import scan, normalization, credentials, maintenance, audit
-# app.include_router(scan.router, prefix="/api/scan", tags=["scan"])
-# app.include_router(normalization.router, prefix="/api/normalization", tags=["normalization"])
-# app.include_router(credentials.router, prefix="/api", tags=["credentials"])
-# app.include_router(maintenance.router, prefix="/api/maintenance", tags=["maintenance"])
-# app.include_router(audit.router, prefix="/api/audit", tags=["audit"])
+from apps.api import scan, credentials, maintenance, audit, normalization
+
+app.include_router(scan.router, prefix="/api/scan", tags=["scan"])
+app.include_router(normalization.router, prefix="/api/normalization", tags=["normalization"])
+app.include_router(credentials.router, prefix="/api", tags=["credentials"])
+app.include_router(maintenance.router, prefix="/api/maintenance", tags=["maintenance"])
+app.include_router(audit.router, prefix="/api/audit", tags=["audit"])
 
 
 if __name__ == "__main__":
