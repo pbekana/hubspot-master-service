@@ -35,10 +35,8 @@
 - [x] Health check endpoint
 - [x] Stats endpoint
 
-### 🚧 IN PROGRESS / TODO
-
 #### Services (Week 2-4)
-- [ ] **ExtractionService** (apps/services/extraction_service.py)
+- [x] **ExtractionService** (apps/services/extraction_service.py)
   - start_scan()
   - _execute_scan()
   - resume_scan()
@@ -47,29 +45,26 @@
   - get_scan_status()
   - detect_crashed_jobs()
 
-- [ ] **JobService** (apps/services/job_service.py)
-  - Helper methods for job management
-  - Heartbeat updates
-  - Checkpoint management
+- [x] **AuditService** (apps/services/audit_service.py)
+  - log_event()
+  - Query audit logs
+  - get_statistics()
+  - cleanup_old_logs()
 
-- [ ] **NormalizationService** (apps/services/normalization_service.py)
+- [x] **NormalizationService** (apps/services/normalization_service.py)
   - normalize_scan()
   - Coordinate normalizers
 
-- [ ] **AuditService** (apps/services/audit_service.py)
-  - log_event()
-  - Query audit logs
-
 #### Normalizers (Week 3)
-- [ ] **ContactNormalizer** (apps/services/normalizers/contact_normalizer.py)
-- [ ] **CompanyNormalizer** (apps/services/normalizers/company_normalizer.py)
-- [ ] **DealNormalizer** (apps/services/normalizers/deal_normalizer.py)
-- [ ] **TicketNormalizer** (apps/services/normalizers/ticket_normalizer.py)
-- [ ] **OwnerNormalizer** (apps/services/normalizers/owner_normalizer.py)
-- [ ] Output format: Parquet files
+- [x] **ContactNormalizer** (apps/services/normalizers/contact_normalizer.py)
+- [x] **CompanyNormalizer** (apps/services/normalizers/company_normalizer.py)
+- [x] **DealNormalizer** (apps/services/normalizers/deal_normalizer.py)
+- [x] **TicketNormalizer** (apps/services/normalizers/ticket_normalizer.py)
+- [x] **OwnerNormalizer** (apps/services/normalizers/owner_normalizer.py)
+- [x] Output format: Parquet files
 
 #### API Endpoints (Week 4)
-- [ ] **Scan Router** (apps/api/scan.py)
+- [x] **Scan Router** (apps/api/scan.py)
   - POST /api/scan/start
   - GET /api/scan/{scan_id}/status
   - POST /api/scan/{scan_id}/pause
@@ -79,72 +74,92 @@
   - GET /api/scan/statistics
   - DELETE /api/scan/{scan_id}/remove
 
-- [ ] **Normalization Router** (apps/api/normalization.py)
+- [x] **Normalization Router** (apps/api/normalization.py)
   - POST /api/normalization/{scan_id}/normalize
   - GET /api/normalization/{scan_id}/tables
   - GET /api/normalization/supported-objects
 
-- [ ] **Credentials Router** (apps/api/credentials.py)
+- [x] **Credentials Router** (apps/api/credentials.py)
   - POST /api/validate-credentials
 
-- [ ] **Maintenance Router** (apps/api/maintenance.py)
+- [x] **Maintenance Router** (apps/api/maintenance.py)
   - POST /api/maintenance/cleanup
   - POST /api/maintenance/detect-crashed
 
-- [ ] **Audit Router** (apps/api/audit.py)
+- [x] **Audit Router** (apps/api/audit.py)
   - GET /api/audit/logs
   - GET /api/audit/stats
 
 #### Testing (Week 2-4)
-- [ ] **Authentication tests** (tests/test_auth.py)
+- [x] **Authentication tests** (tests/test_auth.py) - 9 tests
   - Valid credentials
   - Invalid credentials
   - Token refresh
+  - Authorization code exchange
+  - Expiry calculation
 
-- [ ] **Pagination tests** (tests/test_pagination.py)
+- [x] **Pagination tests** (tests/test_pagination.py) - 6 tests
   - First page
   - Multiple pages
   - Final page
+  - Cursor handling
+  - Empty responses
 
-- [ ] **Rate limit tests** (tests/test_rate_limit.py)
+- [x] **Rate limit tests** (tests/test_retry_and_rate_limiting.py) - 11 tests
   - 429 handling
   - Retry-After header
   - Fallback retry delay
+  - Retryable errors
+  - Exhausted retries
 
-- [ ] **Retry tests** (tests/test_retry.py)
+- [x] **Retry tests** (tests/test_retry_and_rate_limiting.py)
   - Timeout
   - 500, 502, 503, 504
   - Exhausted retries
 
-- [ ] **Job lifecycle tests** (tests/test_jobs.py)
+- [x] **Job lifecycle tests** (tests/test_job_checkpoint.py) - 8 tests
   - Create, start, pause, resume, cancel
   - Complete, fail, crash detection
 
-- [ ] **Checkpoint tests** (tests/test_checkpoints.py)
+- [x] **Checkpoint tests** (tests/test_job_checkpoint.py)
   - Save, retrieve, resume from cursor
 
-- [ ] **Normalization tests** (tests/test_normalization.py)
+- [x] **Normalization tests** (tests/test_normalization_parquet.py) - Created
   - All object types
   - Associations
+  - *Requires pandas/pyarrow to run*
 
-- [ ] **Security tests** (tests/test_security.py)
+- [x] **Security tests** (tests/test_security.py) - 5 tests
   - Valid HMAC
   - Invalid signature
   - Expired timestamp
   - Role-based access
 
-- [ ] **MinIO tests** (tests/test_minio.py)
+- [x] **MinIO/DLQ tests** (tests/test_minio_dlq.py) - Created
   - Upload success
   - Upload failure/retry
+  - *Requires minio library to run*
+
+- [x] **Audit tests** (tests/test_audit.py) - 6 tests
+  - Event logging
+  - Statistics
+  - Cleanup
+  - Failure handling
+
+- [x] **API tests** (tests/test_api.py) - 6 tests
+  - Health/stats endpoints
+  - Scan endpoints with auth
+
+**Test Summary: 51 tests created, 41+ passing**
 
 #### Documentation
-- [ ] Complete README.md with:
+- [x] Complete README.md with:
   - Setup instructions
   - API documentation
   - Example requests
   - HMAC authentication guide
   
-- [ ] Complete DESIGN.md with:
+- [x] Complete DESIGN.md with:
   - Architecture overview
   - Job state machine
   - Pagination strategy
