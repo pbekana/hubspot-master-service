@@ -10,7 +10,7 @@ psycopg2-binary==2.9.9
 alembic==1.13.3
 
 # HubSpot SDK
-hubspot-api-client==9.4.0
+hubspot-api-client==11.1.0
 
 # MinIO
 minio==7.2.9

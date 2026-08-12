@@ -136,3 +136,53 @@ async def test_page_size_limits(api_client):
         call_args = mock_client.get.call_args
         params = call_args.kwargs["params"]
         assert params["limit"] <= api_client.max_page_size
+
+
+@pytest.mark.asyncio
+async def test_get_all_pages_continues_until_last_page(api_client):
+    """Test fetching all pages across multiple HubSpot pages."""
+    first_page = {
+        "results": [
+            {"id": "1", "properties": {"email": "test1@example.com"}},
+        ],
+        "paging": {
+            "next": {"after": "cursor_a"}
+        }
+    }
+    second_page = {
+        "results": [
+            {"id": "2", "properties": {"email": "test2@example.com"}},
+        ],
+        "paging": {}
+    }
+
+    with patch("apps.clients.hubspot_api.HubSpotAPIClient.get_page", new=AsyncMock(side_effect=[first_page, second_page])):
+        result = await api_client.get_all_pages("contacts")
+
+        assert len(result) == 2
+        assert result[0]["id"] == "1"
+        assert result[1]["id"] == "2"
+
+
+@pytest.mark.asyncio
+async def test_get_page_empty_results(api_client):
+    """Test fetching an empty HubSpot page."""
+    mock_response = {
+        "results": [],
+        "paging": {}
+    }
+
+    with patch("httpx.AsyncClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client_class.return_value.__aenter__.return_value = mock_client
+
+        mock_response_obj = MagicMock()
+        mock_response_obj.status_code = 200
+        mock_response_obj.json.return_value = mock_response
+        mock_response_obj.raise_for_status = MagicMock()
+        mock_client.get.return_value = mock_response_obj
+
+        result = await api_client.get_page("contacts")
+
+        assert result["results"] == []
+        assert result.get("paging", {}) == {}
