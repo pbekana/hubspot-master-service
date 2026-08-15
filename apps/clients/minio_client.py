@@ -63,7 +63,7 @@ class MinIOClient:
         
         logger.info(f"Uploading {local_path} to MinIO: {object_key}")
         
-        async def _upload():
+        try:
             self.ensure_bucket_exists()
             
             self.client.fput_object(
@@ -73,12 +73,8 @@ class MinIOClient:
                 content_type=content_type,
             )
             
-            return object_key
-        
-        try:
-            result = await retry_with_backoff(_upload)
             logger.info(f"Successfully uploaded to MinIO: {object_key}")
-            return result
+            return object_key
         except Exception as e:
             logger.error(f"Failed to upload to MinIO: {str(e)}")
             raise

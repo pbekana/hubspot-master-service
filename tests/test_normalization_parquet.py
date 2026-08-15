@@ -56,7 +56,7 @@ def test_company_normalizer_handles_missing_values():
 
     assert df.iloc[0]["name"] is None
     assert df.iloc[0]["domain"] == "example.com"
-    assert df.iloc[0]["archived"] is True
+    assert bool(df.iloc[0]["archived"]) is True
 
 
 def test_deal_normalizer_generates_line_items_and_associations():

@@ -25,7 +25,7 @@ async def validate_credentials(
     try:
         auth_client = HubSpotAuthClient()
         
-        # Validate credentials
+        # Validate credentials (this method is already async)
         is_valid = await auth_client.validate_credentials(
             access_token=request.access_token,
             refresh_token=request.refresh_token,

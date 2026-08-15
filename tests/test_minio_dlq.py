@@ -39,7 +39,10 @@ async def test_upload_file_success(tmp_path):
 @pytest.mark.asyncio
 async def test_upload_normalized_data_generates_expected_object_keys():
     client = MinIOClient()
-    client.upload_file = MagicMock(side_effect=lambda local_path, object_key, content_type="application/octet-stream": object_key)
+    # Mock upload_file to return the object key synchronously
+    async def mock_upload(local_path, object_key, content_type="application/octet-stream"):
+        return object_key
+    client.upload_file = mock_upload
 
     result = await client.upload_normalized_data(
         scan_id=1,
@@ -61,7 +64,8 @@ async def test_upload_file_failure_raises(tmp_path):
     client = MinIOClient()
     client.client = MagicMock()
     client.client.bucket_exists.return_value = True
-    client.client.fput_object.side_effect = S3Error("upload failed")
+    # S3Error requires specific parameters
+    client.client.fput_object.side_effect = Exception("Upload failed")
 
     with pytest.raises(Exception):
         await client.upload_file(str(test_file), "path/to/failure.txt")
